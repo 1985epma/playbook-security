@@ -1,0 +1,21 @@
+---
+- hosts: dns-servers
+  gather_facts: yes
+  become: yes
+
+  vars:
+    domain_name: example.com
+
+  tasks:
+    - name: Install Fierce
+      apt:
+        name: fierce
+        state: latest
+
+    - name: Run Fierce
+      command: fierce -dns {{ domain_name }} -threads 10 -file /tmp/fierce-output.txt
+      register: fierce_output
+
+    - name: Display Fierce output
+      debug:
+        var: fierce_output.stdout_lines
