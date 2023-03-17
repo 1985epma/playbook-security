@@ -1,0 +1,21 @@
+---
+- name: Run Lynis with ISO 27001 compliance
+  hosts: all
+  become: yes
+  vars:
+    lynis_audit_file: /path/to/lynis.audit
+  tasks:
+    - name: Install Lynis
+      apt:
+        name: lynis
+        state: present
+      become: yes
+
+    - name: Run Lynis audit with ISO 27001 profile
+      shell: lynis audit system --tests-from-group compliance_iso27001 --auditor "My Company" --audit-log {{ lynis_audit_file }}
+      register: lynis_result
+      changed_when: false
+
+    - name: Display Lynis results
+      shell: cat {{ lynis_audit_file }}
+      changed_when: false

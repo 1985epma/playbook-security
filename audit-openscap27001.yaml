@@ -1,0 +1,27 @@
+---
+- name: Run OpenSCAP with ISO 27001 profile
+  hosts: all
+  become: yes
+  vars:
+    iso_path: /path/to/iso27001.xml
+    result_path: /path/to/results.xml
+    profile: xccdf_org.ssgproject.content_profile_pci-dss
+  tasks:
+    - name: Ensure openscap is installed
+      apt:
+        name: openscap-utils
+        state: present
+      become: yes
+
+    - name: Validate ISO 27001 file
+      shell: oscap xccdf validate {{ iso_path }}
+      register: iso_validate_result
+      changed_when: false
+
+    - name: Run OpenSCAP with ISO 27001 profile
+      shell: oscap xccdf eval --profile {{ profile }} --results {{ result_path }} {{ iso_path }}
+      register: openscap_result
+
+    - name: Display OpenSCAP results
+      shell: oscap info {{ result_path }}
+      changed_when: false
